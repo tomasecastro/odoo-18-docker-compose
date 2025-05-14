@@ -172,6 +172,7 @@ rm -r $DESTINATION/odoo/addons/*.zip
 
 # Establecer permisos 777 para los directorios específicos
 chmod -R 777 $DESTINATION/odoo/addons $DESTINATION/odoo/etc $DESTINATION/odoo/postgresql
+chmod -x $DESTINATION/odoo/build/entrypoint.sh
 
 # Ejecutar Odoo
 docker-compose -f $DESTINATION/docker-compose.yml up -d
