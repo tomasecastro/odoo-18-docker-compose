@@ -38,6 +38,7 @@ services:
 #      context: ./odoo/build/
 #      dockerfile: DockerfileOdoo
     image: ${ODOO_IMAGE}
+    user: root
     container_name: odoo18_app
     depends_on:
       - db

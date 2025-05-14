@@ -10,7 +10,7 @@ set -e
 : ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo18@2024'}}}
 
 # install python packages
-# pip3 install pip --upgrade                # may cause errors
+#pip3 install pip --upgrade                # may cause errors
 #pip3 install -r /etc/odoo/requirements.txt
 pip install geopy dropbox pyncclient nextcloud-api-wrapper boto3 paramiko minio --break-system-packages
 
