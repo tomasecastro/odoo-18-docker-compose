@@ -131,41 +131,41 @@ fi
 # Obtener la dirección IP local
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
-mkdir $MINIO_PATH
-chmod -R 777 $MINIO_PATH
-echo "$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY" >> $DESTINATION/.passwd-s3fs
-chmod 600 $DESTINATION/.passwd-s3fs
-apt-get update && apt-get install -y s3fs
-s3fs odoo-bucket $MINIO_PATH -o dbglevel=info -f -o curldbg -o passwd_file=$DESTINATION/.passwd-s3fs -o host=http://$IP_ADDRESS:9000 -o endpoint=us-east-1 -o use_path_request_style -o allow_other &
+#mkdir $MINIO_PATH
+#chmod -R 777 $MINIO_PATH
+#echo "$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY" >> $DESTINATION/.passwd-s3fs
+#chmod 600 $DESTINATION/.passwd-s3fs
+#apt-get update && apt-get install -y s3fs
+#s3fs odoo-bucket $MINIO_PATH -o dbglevel=info -f -o curldbg -o passwd_file=$DESTINATION/.passwd-s3fs -o host=http://$IP_ADDRESS:9000 -o endpoint=us-east-1 -o use_path_request_style -o allow_other &
 
 # Definir la ruta completa del directorio de Minio
-MINIO_DIR="$BASE_DIR/$MINIO_PATH"  # Esto asume que odoo está dentro de la ruta actual
+#MINIO_DIR="$BASE_DIR/$MINIO_PATH"  # Esto asume que odoo está dentro de la ruta actual
 
 # Crear el archivo de servicio systemd para s3fs
-cat <<EOF | sudo tee /etc/systemd/system/s3fs-odoo-bucket.service
-[Unit]
-Description=Montar el bucket S3 odoo-bucket usando s3fs
-After=network.target
+#@cat <<EOF | sudo tee /etc/systemd/system/s3fs-odoo-bucket.service
+#[Unit]
+#Description=Montar el bucket S3 odoo-bucket usando s3fs
+#After=network.target
 
-[Service]
-ExecStartPre=/bin/sh -c "until docker ps | grep -q 'minio'; do echo 'Esperando a que el contenedor minio esté arriba...'; sleep 5; done"
-ExecStart=/usr/bin/s3fs odoo-bucket $MINIO_DIR -o passwd_file=$BASE_DIR/$DESTINATION/.passwd-s3fs -o host=http://$IP_ADDRESS:9000 -o endpoint=us-east-1 -o use_path_request_style -o allow_other
-Restart=always
-User=$USER
-Group=$GROUP
+#[Service]
+#ExecStartPre=/bin/sh -c "until docker ps | grep -q 'minio'; do echo 'Esperando a que el contenedor minio esté arriba...'; sleep 5; done"
+#ExecStart=/usr/bin/s3fs odoo-bucket $MINIO_DIR -o passwd_file=$BASE_DIR/$DESTINATION/.passwd-s3fs -o host=http://$IP_ADDRESS:9000 -o endpoint=us-east-1 -o use_path_request_style -o allow_other
+#Restart=always
+#User=$USER
+#Group=$GROUP
 
-[Install]
-WantedBy=multi-user.target
-EOF
+#[Install]
+#WantedBy=multi-user.target
+#EOF
 
 # Recargar systemd para reconocer el nuevo servicio
-sudo systemctl daemon-reload
+#sudo systemctl daemon-reload
 
 # Habilitar el servicio para que se inicie automáticamente al arrancar el sistema
-sudo systemctl enable s3fs-odoo-bucket.service
+#sudo systemctl enable s3fs-odoo-bucket.service
 
 # Iniciar el servicio
-sudo systemctl start s3fs-odoo-bucket.service
+#sudo systemctl start s3fs-odoo-bucket.service
 
 unzip -x $DESTINATION/odoo/addons/*.zip
 rm -r $DESTINATION/odoo/addons/*.zip
@@ -181,4 +181,4 @@ docker-compose -f $DESTINATION/docker-compose.yml up -d
 echo "Todas los datos de acceso como usuarios y contraselas estan dentro en el archivo $BASE_DIR/$DESTINATION/.env"
 echo "Odoo iniciado en http://$IP_ADDRESS:$PORT | Contraseña maestra: minhng.info | Puerto de chat en vivo: $CHAT"
 echo "El minIOiniciado en http://$IP_ADDRESS:9001 | Usuario por defecto: $MINIO_ROOT_USER, y la contraseña maestra: $MINIO_ROOT_PASSWORD"
-echo "Se creo el servicio /etc/systemd/system/s3fs-odoo-bucket.service para controlar el s3fs"
+#echo "Se creo el servicio /etc/systemd/system/s3fs-odoo-bucket.service para controlar el s3fs"
