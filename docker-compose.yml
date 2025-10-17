@@ -14,35 +14,16 @@ services:
     volumes:
       - ./postgresql:/var/lib/postgresql/data
 
-  minio:
-    image: minio/minio
-    container_name: minio
-    environment:
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-      - MINIO_ACCESS_KEY= ${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY= ${MINIO_SECRET_KEY}
-      - MINIO_DOMAIN= ${MINIO_DOMAIN}
-      - MINIO_VIRTUAL_HOST= ${MINIO_VIRTUAL_HOST}
-
-    restart: always
-    ports:
-      - "${MINIO_PORT}:9000"    # Puerto HTTP de Minio desde la variable de entorno
-      - "${MINIO_ADMIN_PORT}:9001"  # Puerto admin de Minio desde la variable de entorno
-    volumes:
-      - ./minio/data:/data
-    command: server /data --console-address ":9001"
-
   odoo:
-#    build:
-#      context: ./odoo/build/
-#      dockerfile: DockerfileOdoo
+    # build:
+    #   context: ./odoo/build/
+    #   dockerfile: DockerfileOdoo
     image: ${ODOO_IMAGE}
     user: root
     container_name: odoo18_app
     depends_on:
       - db
-      - minio
+      
     devices:
       - "/dev/fuse"
     ports:
@@ -54,16 +35,11 @@ services:
       - USER=${POSTGRES_USER}
       - PASSWORD=${POSTGRES_PASSWORD}
       - TZ=${TZ}
-      - MINIO_URL=http://${MINIO_DOMAIN}:${MINIO_PORT}  # URL de Minio para Odoo
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}  # Reemplaza <ACCESS_KEY> con tu clave de acceso de MinIO
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY} # Reemplaza <SECRET_KEY> con tu clave secreta de MinIO
-      - MINIO_BUCKET=odoo-bucket  # Nombre del bucket en MinIO donde se almacenarán los archivos
     volumes:
       - ./odoo/odoo-data:/var/lib/odoo
       - ./odoo/addons:/mnt/extra-addons
       - ./odoo/etc:/etc/odoo
-  #    - ./odoo/build/entrypoint.sh:/entrypoint.sh
-#      - ./filestore:/mnt/minio  # Montar el bucket de MinIO en el filestore de Odoo
-    #command: /entrypoint.sh
+      # - ./odoo/build/entrypoint.sh:/entrypoint.sh      
+      # command: /entrypoint.sh
 
     restart: always

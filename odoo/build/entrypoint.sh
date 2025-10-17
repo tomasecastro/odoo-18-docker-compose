@@ -12,7 +12,7 @@ set -e
 # install python packages
 #pip3 install pip --upgrade                # may cause errors
 #pip3 install -r /etc/odoo/requirements.txt
-pip install geopy dropbox pyncclient nextcloud-api-wrapper boto3 paramiko minio --break-system-packages
+pip install geopy dropbox pyncclient nextcloud-api-wrapper boto3 paramiko --break-system-packages
 
 
 # sed -i 's|raise werkzeug.exceptions.BadRequest(msg)|self.jsonrequest = {}|g' /usr/lib/python3/dist-packages/odoo/http.py

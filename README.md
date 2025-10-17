@@ -2,7 +2,6 @@
 * Cambios realizados, actualizacion de la version del docker utilizado.
 * Cambios en el run.sh para mis ajustes personales.
 * Cambio en la forma de organizar el despliegue de los dockerfile.
-* Implementacion de [MinIO](https://min.io/?), para mejorar el control de las imagenes y la portabilidad de la implementacion entre servidores.
 * Se hace el cambio para postgres 15 porque es lo recomendado en la documentacion de odoo.
 * Se creo el archivo de variables de entorno para mejorar la organización y seguriodad de los Docker.
 * Se incluye el addons de auto backup, incluyendo la modificacion en el entrypoint.sh, para incluyir durante la instalación las dependencias de python del modulo (el modulo debe ser instalado y configurado manualmente despues de completarse la instalacion).
@@ -152,15 +151,6 @@ Y ejecutamos crear una nueva base de datos.
 Nota. Esta guia no cubre el escenario donde se tenga bases de datos respaldadas previamente.
 
 <img src="screenshots/odoo-17-welcome-screenshot.png" width="50%">
-
-## Para remover el servicio cliente de MinIO del Host
-
-* sudo umount -l RUTA_PATH_DOCKER/odoo/odoo-data
-* sudo systemctl stop s3fs-odoo-bucket
-* sudo systemctl disable s3fs-odoo-bucket
-* sudo rm /etc/systemd/system/s3fs-odoo-bucket.service
-* sudo systemctl daemon-reload
-* sudo apt remove --purge s3fs
 
 ## Herramientas o addons adicionales
 
