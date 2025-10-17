@@ -5,19 +5,18 @@
 * Se hace el cambio para postgres 15 porque es lo recomendado en la documentacion de odoo.
 * Se creo el archivo de variables de entorno para mejorar la organización y seguriodad de los Docker.
 * Se incluye el addons de auto backup, incluyendo la modificacion en el entrypoint.sh, para incluyir durante la instalación las dependencias de python del modulo (el modulo debe ser instalado y configurado manualmente despues de completarse la instalacion).
-<<<<<<< HEAD
-
-=======
->>>>>>> 41ff2a7e81fa03c90854811914b34951db2983f9
 
 ---
 # Instalación de Odoo 18.0 con un solo comando (Admite múltiples instancias de Odoo en un solo servidor).
 
 ## Instalación rápida
 
-Instale [docker](https://docs.docker.com/get-docker/) y [docker-compose](https://docs.docker.com/compose/install/) por su cuenta, luego ejecute lo siguiente para configurar la primera instancia de Odoo en `localhost:10017` (contraseña maestra predeterminada: **`minhng.info`**):
-- Si desea iniciar el servidor con un puerto diferente, cambie **10017** por otro valor en **docker-compose.yml** dentro del directorio principal, el puerto por defecto del odoo es el 8069, para esta implementacion se utiliza el puerto 10017, para ser expuesto por el docker, si lo desea puede cambiarlo en la siguiente linea.
-- Recuerde que puede modificar el docker-compose.yml para ajustar las configuraciones de sus docker una vez instalado.
+Instale [docker](https://docs.docker.com/get-docker/) y [docker-compose](https://docs.docker.com/compose/install/) por su cuenta, luego ejecute lo siguiente para configurar la primera instancia de Odoo en `localhost:10018` (contraseña maestra predeterminada: **`minhng.info`**):
+
+**Importante:** Ejecute el comando desde el directorio donde desea crear la instalación de Odoo (ej: `/srv/`, `/opt/`, etc.).
+
+- Si desea iniciar el servidor con un puerto diferente, cambie **10018** por otro valor en los parámetros del comando.
+- El script creará automáticamente la carpeta con el nombre especificado y configurará todas las rutas absolutas necesarias.
 
 ``` bash
 curl -s https://raw.githubusercontent.com/tomasecastro/odoo-18-docker-compose/master/run.sh | sudo bash -s odoo-one 10018 20018
@@ -29,9 +28,12 @@ curl -s https://raw.githubusercontent.com/tomasecastro/odoo-18-docker-compose/ma
 ```
 
 Algunos argumentos:
-* Primer argumento (**odoo-one**): Carpeta de despliegue de Odoo
-* Segundo argumento (**10017**): Puerto de Odoo
-* Tercer argumento (**20017**): Puerto del chat en vivo
+* Primer argumento (**odoo-one**): Nombre de la carpeta donde se desplegará Odoo
+* Segundo argumento (**10018**): Puerto de acceso web de Odoo
+* Tercer argumento (**20018**): Puerto del chat en vivo (longpolling)
+
+**Ejemplo de ejecución:**
+Si ejecutas el comando desde `/srv/`, se creará la instalación en `/srv/odoo-one/` con todas las rutas configuradas automáticamente.
 
 Si `curl` no se encuentra, instálelo:
 
@@ -47,7 +49,7 @@ Iniciar el contenedor:
 ``` sh
 docker-compose up
 ```
-Luego abra `localhost:10017` o `IP_EQUIPO_DONDE_EJECUTA_EL_DOCKER:10017` para acceder a Odoo 18.
+Luego abra `localhost:10018` o `IP_EQUIPO_DONDE_EJECUTA_EL_DOCKER:10018` para acceder a Odoo 18.
 
 - **Si tiene problemas de permisos**, cambie los permisos de la carpeta para asegurarse de que el contenedor pueda acceder al directorio, en el equipo que ejecuta los docker:
 
@@ -57,11 +59,11 @@ $ sudo chmod -R 775 etc
 $ sudo chmod -R 775 postgresql
 ```
 
-- Si desea iniciar el servidor con un puerto diferente, cambie **10017** por otro valor en **docker-compose.yml** dentro del directorio principal, el puerto por defecto del odoo es el 8069, si desea realizar cambios en el puerto:
+- Si desea iniciar el servidor con un puerto diferente, cambie **10018** por otro valor en **docker-compose.yml** dentro del directorio principal, el puerto por defecto del odoo es el 8069, si desea realizar cambios en el puerto:
 
 ```
 ports:
- - "10017:8069"
+ - "10018:8069"
 ```
 
 - Para ejecutar el contenedor de Odoo en modo separado (para poder cerrar la terminal sin detener Odoo):
@@ -86,6 +88,35 @@ docker-compose up -d
 $ if grep -qF "fs.inotify.max_user_watches" /etc/sysctl.conf; then echo $(grep -F "fs.inotify.max_user_watches" /etc/sysctl.conf); else echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf; fi
 $ sudo sysctl -p    # aplicar nueva configuración inmediatamente
 ``` 
+
+## Resolución de problemas comunes
+
+### Error: docker-compose: command not found
+Si obtienes este error, instala Docker Compose:
+
+```bash
+# Para Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+
+# O instalación manual
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+### Error: chmod: cannot access 'directorio': No such file or directory
+Este error indica problemas de rutas. Asegúrate de:
+1. Ejecutar el script desde el directorio correcto
+2. Tener permisos de escritura en el directorio
+3. Que el script use rutas absolutas (corregido en esta versión)
+
+### Uso de rutas absolutas
+El script ahora utiliza rutas absolutas automáticamente. Cuando ejecutes:
+```bash
+cd /srv
+curl -s https://raw.githubusercontent.com/tomasecastro/odoo-18-docker-compose/master/run.sh | sudo bash -s odoo-one 10018 20018
+```
+Se creará la instalación en `/srv/odoo-one/` con todas las rutas configuradas correctamente. 
 
 ## Complementos personalizados
 
@@ -119,7 +150,7 @@ docker-compose down
 
 ## Chat en vivo
 
-En [docker-compose.yml#L21](docker-compose.yml#L21), se expuso el puerto **20017** para el chat en vivo en el host.
+En [docker-compose.yml#L21](docker-compose.yml#L21), se expuso el puerto **20018** para el chat en vivo en el host.
 
 Configuración de **nginx** para activar la función de chat en vivo (en producción):
 
@@ -128,7 +159,7 @@ Configuración de **nginx** para activar la función de chat en vivo (en producc
 server {
     #...
     location /longpolling/ {
-        proxy_pass http://0.0.0.0:20017/longpolling/;
+        proxy_pass http://0.0.0.0:20018/longpolling/;
     }
     #...
 }
