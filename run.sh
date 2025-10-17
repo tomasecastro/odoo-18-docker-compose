@@ -30,7 +30,6 @@ fi
 
 # Actualizar las variables ODOO_PORT y ODOO_LONGPOLLING_PORT en el archivo .env
 if ! grep -q "^ODOO_PORT=" $DESTINATION/.env; then
-  export ODOO_PORT=$(openssl rand -base64 16)  # Generar una contraseña aleatoria
   echo "ODOO_PORT=$PORT" >> $DESTINATION/.env
 else
   # Si ya existe, actualizar el valor
@@ -38,7 +37,6 @@ else
 fi
 
 if ! grep -q "^ODOO_LONGPOLLING_PORT=" $DESTINATION/.env; then
-  export ODOO_LONGPOLLING_PORT=$(openssl rand -base64 16)  # Generar una contraseña aleatoria
   echo "ODOO_LONGPOLLING_PORT=$CHAT" >> $DESTINATION/.env
 else
   # Si ya existe, actualizar el valor
@@ -55,17 +53,20 @@ find $DESTINATION -type d -exec chmod 755 {} \;
 # Obtener la dirección IP local
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
-unzip -x $DESTINATION/odoo/addons/*.zip
-rm -r $DESTINATION/odoo/addons/*.zip
+# Descomprimir archivos zip de addons si existen
+if ls $DESTINATION/odoo/addons/*.zip 1> /dev/null 2>&1; then
+    unzip -x $DESTINATION/odoo/addons/*.zip -d $DESTINATION/odoo/addons/
+    rm -r $DESTINATION/odoo/addons/*.zip
+fi
 
 # Establecer permisos 777 para los directorios específicos
-chmod -R 777 $DESTINATION/odoo/addons $DESTINATION/odoo/etc $DESTINATION/odoo/postgresql
+chmod -R 777 $DESTINATION/odoo/addons $DESTINATION/odoo/etc $DESTINATION/postgresql
 chmod -R 777 $DESTINATION/odoo/build/entrypoint.sh
-chmod -R 777 $DESTINATION/odoo/logrotate
+chmod -R 777 $DESTINATION/odoo/etc/logrotate
 
 # Ejecutar Odoo
 docker-compose -f $DESTINATION/docker-compose.yml up -d
 
 # Mostrar información de acceso
-echo "Todas los datos de acceso como usuarios y contraselas estan dentro en el archivo $BASE_DIR/$DESTINATION/.env"
+echo "Todas los datos de acceso como usuarios y contraselas estan dentro en el archivo $DESTINATION/.env"
 echo "Odoo iniciado en http://$IP_ADDRESS:$PORT | Contraseña maestra: minhng.info | Puerto de chat en vivo: $CHAT"
