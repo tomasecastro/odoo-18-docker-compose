@@ -85,8 +85,14 @@ if ls $ABSOLUTE_DESTINATION/odoo/addons/*.zip 1> /dev/null 2>&1; then
     rm -r $ABSOLUTE_DESTINATION/odoo/addons/*.zip
 fi
 
+# Establecer permisos para el entrypoint y datos de Odoo
+chmod +x $ABSOLUTE_DESTINATION/odoo/build/entrypoint.sh
+sudo chown -R 101:101 $ABSOLUTE_DESTINATION/odoo/odoo-data
+
 # Establecer permisos 777 para los directorios específicos
-chmod -R 777 $ABSOLUTE_DESTINATION/odoo/addons $ABSOLUTE_DESTINATION/odoo/etc $ABSOLUTE_DESTINATION/postgresql
+chmod -R 777 $ABSOLUTE_DESTINATION/odoo/addons 
+chmod -R 777 $ABSOLUTE_DESTINATION/odoo/etc 
+chmod -R 777 $ABSOLUTE_DESTINATION/postgresql
 
 # Ejecutar Odoo
 docker compose -f $ABSOLUTE_DESTINATION/docker-compose.yml up -d
