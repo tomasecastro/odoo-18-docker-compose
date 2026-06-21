@@ -31,10 +31,10 @@ services:
       - "${ODOO_LONGPOLLING_PORT}:8072"
     tty: true
     environment:
-      - HOST=postgres_db
-      - USER=${POSTGRES_USER}
-      - PASSWORD=${POSTGRES_PASSWORD}
-      - TZ=${TZ}
+      - DB_HOST=postgres_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=${TZ}      
     volumes:
       - ./odoo/odoo-data:/var/lib/odoo
       - ./odoo/addons:/mnt/extra-addons
